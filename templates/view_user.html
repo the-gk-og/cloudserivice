@@ -1,13 +1,33 @@
 {% extends 'base.html' %}
-{% block title %}User Profile{% endblock %}
+{% block title %}Manage User{% endblock %}
 {% block content %}
-<h2 class="text-2xl font-bold text-white mb-4">User Profile</h2>
-<div class="bg-white/10 border border-white/20 p-6 rounded-lg text-white">
+<h2 class="text-2xl font-bold text-white mb-4">Manage User</h2>
+<div class="bg-white/10 border border-white/20 p-6 rounded-lg text-white space-y-2">
     <p><strong>Username:</strong> {{ user[0] }}</p>
     <p><strong>Created At:</strong> {{ user[1] }}</p>
     <p><strong>Admin:</strong> {{ 'Yes' if user[2] == 1 else 'No' }}</p>
     <p><strong>Total Notes:</strong> {{ note_count }}</p>
     <p><strong>Total Files:</strong> {{ file_count }}</p>
 </div>
+
+<div class="mt-6 space-y-4">
+    <form method="POST" action="{{ url_for('admin.edit_username', user_id=user_id) }}">
+        <input type="text" name="username" placeholder="New username" class="input-field px-4 py-2 rounded w-full">
+        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-2">Change Username</button>
+    </form>
+
+    <form method="POST" action="{{ url_for('admin.force_password_reset', user_id=user_id) }}">
+        <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">Force Password Reset</button>
+    </form>
+
+    <form method="POST" action="{{ url_for('admin.clear_storage', user_id=user_id) }}">
+        <button type="submit" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded">Clear Storage</button>
+    </form>
+
+    <form method="POST" action="{{ url_for('admin.delete_user', user_id=user_id) }}">
+        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Delete User</button>
+    </form>
+</div>
+
 <a href="{{ url_for('admin.admin_dashboard') }}" class="mt-6 inline-block text-blue-300 hover:text-blue-400">← Back to Dashboard</a>
 {% endblock %}

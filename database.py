@@ -13,11 +13,13 @@ def init_db():
                   encryption_key TEXT NOT NULL,
                   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
 
-    # Check if 'is_admin' column exists
+    # Add missing columns if needed
     c.execute("PRAGMA table_info(users)")
     columns = [col[1] for col in c.fetchall()]
     if 'is_admin' not in columns:
         c.execute("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0")
+    if 'force_reset' not in columns:
+        c.execute("ALTER TABLE users ADD COLUMN force_reset INTEGER DEFAULT 0")
 
     # Notes table
     c.execute('''CREATE TABLE IF NOT EXISTS notes
