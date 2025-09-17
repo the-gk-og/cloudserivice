@@ -22,3 +22,7 @@ i really dont know just stumleing thru it but hears what i do
 3. log out and back in 2 options in yellow should now be in the nav bar
 
    now the admin features should be working
+
+
+# 2FA
+inprogress
