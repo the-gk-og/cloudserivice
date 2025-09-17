@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - SecureVault{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-4xl font-bold text-white mb-2">🛡️ Admin Dashboard</h1>
+            <p class="text-white/70">System overview and management</p>
+        </div>
+        <div class="flex space-x-3">
+            <a href="/admin/users" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                👥 Manage Users
+            </a>
+            <a href="/admin/system" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors">
+                ⚙️ System Info
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="glass-effect rounded-xl p-6 text-center transform hover:scale-105 transition-all duration-300">
+            <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-1">{{ stats.total_users }}</h3>
+            <p class="text-white/70 text-sm">Total Users</p>
+            <p class="text-green-400 text-xs mt-1">+{{ stats.new_users_week }} this week</p>
+        </div>
+
+        <div class="glass-effect rounded-xl p-6 text-center transform hover:scale-105 transition-all duration-300">
+            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-1">{{ stats.total_notes }}</h3>
+            <p class="text-white/70 text-sm">Encrypted Notes</p>
+            <p class="text-green-400 text-xs mt-1">+{{ stats.new_notes_week }} this week</p>
+        </div>
+
+        <div class="glass-effect rounded-xl p-6 text-center transform hover:scale-105 transition-all duration-300">
+            <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-1">{{ stats.total_files }}</h3>
+            <p class="text-white/70 text-sm">Stored Files</p>
+            <p class="text-blue-400 text-xs mt-1">{{ stats.total_file_size }} total</p>
+        </div>
+
+        <div class="glass-effect rounded-xl p-6 text-center transform hover:scale-105 transition-all duration-300">
+            <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-1">99.9%</h3>
+            <p class="text-white/70 text-sm">System Uptime</p>
+            <p class="text-green-400 text-xs mt-1">All systems operational</p>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid lg:grid-cols-2 gap-8 mb-8">
+        <div class="glass-effect rounded-xl p-6">
+            <h3 class="text-xl font-bold text-white mb-6">📈 User Growth</h3>
+            <canvas id="userChart" width="400" height="200"></canvas>
+        </div>
+        
+        <div class="glass-effect rounded-xl p-6">
+            <h3 class="text-xl font-bold text-white mb-6">📝 Note Activity</h3>
+            <canvas id="noteChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="glass-effect rounded-xl p-6 mb-8">
+        <h3 class="text-xl font-bold text-white mb-6">🔄 Recent User Activity</h3>
+        
+        {% if stats.recent_activity %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-white/20">
+                            <th class="text-left py-3 text-white font-semibold">User</th>
+                            <th class="text-left py-3 text-white font-semibold">Last Activity</th>
+                            <th class="text-center py-3 text-white font-semibold">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for activity in stats.recent_activity %}
+                            <tr class="border-b border-white/10 hover:bg-white/5 transition-colors">
+                                <td class="py-4 text-white font-medium">{{ activity[0] }}</td>
+                                <td class="py-4 text-white/70">{{ activity[1] }} notes</td>
+                                <td class="py-4 text-white/70">
+                                    {% if activity[2] %}
+                                        {{ activity[2] }}
+                                    {% else %}
+                                        No activity yet
+                                    {% endif %}
+                                </td>
+                                <td class="py-4 text-center">
+                                    <a href="/admin/users?search={{ activity[0] }}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                                        View Details
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-8">
+                <p class="text-white/70">No user activity found</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid md:grid-cols-3 gap-6">
+        <div class="glass-effect rounded-xl p-6 text-center hover:bg-white/10 transition-colors">
+            <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                </svg>
+            </div>
+            <h4 class="text-lg font-semibold text-white mb-2">Create Admin User</h4>
+            <p class="text-white/70 text-sm mb-4">Grant administrative privileges to existing users</p>
+            <a href="/admin/users" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                Manage Users
+            </a>
+        </div>
+
+        <div class="glass-effect rounded-xl p-6 text-center hover:bg-white/10 transition-colors">
+            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+            </div>
+            <h4 class="text-lg font-semibold text-white mb-2">System Monitoring</h4>
+            <p class="text-white/70 text-sm mb-4">Monitor system performance and resource usage</p>
+            <a href="/admin/system" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                View System Info
+            </a>
+        </div>
+
+        <div class="glass-effect rounded-xl p-6 text-center hover:bg-white/10 transition-colors">
+            <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+            </div>
+            <h4 class="text-lg font-semibold text-white mb-2">View Logs</h4>
+            <p class="text-white/70 text-sm mb-4">Access system logs and audit trails</p>
+            <a href="/admin/logs" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                View Logs
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js for analytics -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+    // Fetch and display charts
+    fetch('/admin/api/stats')
+        .then(response => response.json())
+        .then(data => {
+            // User Growth Chart
+            const userCtx = document.getElementById('userChart').getContext('2d');
+            new Chart(userCtx, {
+                type: 'line',
+                data: {
+                    labels: data.user_registrations.map(item => item[0]),
+                    datasets: [{
+                        label: 'New Users',
+                        data: data.user_registrations.map(item => item[1]),
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'white'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Note Activity Chart
+            const noteCtx = document.getElementById('noteChart').getContext('2d');
+            new Chart(noteCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.note_creations.map(item => item[0]),
+                    datasets: [{
+                        label: 'Notes Created',
+                        data: data.note_creations.map(item => item[1]),
+                        backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                        borderColor: 'rgb(34, 197, 94)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'white'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching stats:', error);
+        });
+</script>
+{% endblock %}

@@ -1,31 +1,161 @@
 {% extends "base.html" %}
+
+{% block title %}Login - SecureVault{% endblock %}
+
 {% block content %}
-<div class="max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-xl p-8">
-    <h2 class="text-2xl font-bold text-white mb-6 text-center">Login</h2>
-    <form method="POST">
-        <div class="mb-4">
-            <label for="username" class="block text-white mb-2 font-medium">Username</label>
-            <input type="text" id="username" name="username" required 
-                   class="w-full px-4 py-3 bg-white/20 text-white rounded-lg border border-white/30 
-                          focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 
-                          placeholder:text-white/50 transition-all duration-200"
-                   placeholder="Enter your username" autocomplete="username">
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div class="text-center animate-slide-up">
+            <h2 class="text-3xl font-bold text-white mb-2">Welcome Back</h2>
+            <p class="text-white/70">Sign in to access your secure vault</p>
         </div>
-        <div class="mb-6">
-            <label for="password" class="block text-white mb-2 font-medium">Password</label>
-            <input type="password" id="password" name="password" required 
-                   class="w-full px-4 py-3 bg-white/20 text-white rounded-lg border border-white/30 
-                          focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 
-                          placeholder:text-white/50 transition-all duration-200"
-                   placeholder="Enter your password" autocomplete="current-password">
+
+        <!-- Passkey Login Option -->
+        <div class="glass-effect rounded-xl p-6 animate-slide-up">
+            <button id="passkey-login" class="w-full py-3 px-4 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-500 mb-4">
+                <span class="flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 12H9v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-6.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                    </svg>
+                    <span id="passkey-text">Sign in with Passkey</span>
+                </span>
+            </button>
+
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-white/30"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-transparent text-white/70">or continue with password</span>
+                </div>
+            </div>
         </div>
-        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-medium transition-colors duration-200">
-            Sign In
-        </button>
-    </form>
-    <p class="text-center text-white/70 mt-6">
-        Don't have an account? 
-        <a href="/register" class="text-blue-300 hover:text-blue-200 font-medium transition-colors">Register here</a>
-    </p>
+
+        <!-- Traditional Login Form -->
+        <div class="glass-effect rounded-xl p-8 animate-slide-up">
+            <form method="POST" class="space-y-6">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-white mb-2">Username</label>
+                    <input type="text" id="username" name="username" required
+                           class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                           placeholder="Enter your username" autocomplete="username">
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-white mb-2">Password</label>
+                    <input type="password" id="password" name="password" required
+                           class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                           placeholder="Enter your password" autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <span class="flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                        </svg>
+                        Sign In
+                    </span>
+                </button>
+            </form>
+
+            <div class="text-center mt-6 pt-6 border-t border-white/20">
+                <p class="text-white/70">
+                    Don't have an account?
+                    <a href="/register" class="text-blue-300 hover:text-blue-200 font-medium transition-colors">Create one here</a>
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+// Passkey authentication
+document.getElementById('passkey-login').addEventListener('click', async function() {
+    const button = this;
+    const buttonText = document.getElementById('passkey-text');
+
+    try {
+        button.disabled = true;
+        buttonText.textContent = 'Authenticating...';
+        button.classList.add('opacity-75');
+
+        if (!window.PublicKeyCredential) throw new Error('Passkeys are not supported in this browser');
+
+        const beginResponse = await fetch('/auth/passkey-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'begin' })
+        });
+
+        if (!beginResponse.ok) throw new Error('Failed to begin authentication');
+
+        const options = await beginResponse.json();
+        options.challenge = base64ToArrayBuffer(options.challenge);
+
+        const credential = await navigator.credentials.get({ publicKey: options });
+
+        const credentialData = {
+            action: 'complete',
+            id: credential.id,
+            rawId: arrayBufferToBase64(credential.rawId),
+            response: {
+                authenticatorData: arrayBufferToBase64(credential.response.authenticatorData),
+                clientDataJSON: arrayBufferToBase64(credential.response.clientDataJSON),
+                signature: arrayBufferToBase64(credential.response.signature),
+                userHandle: credential.response.userHandle ? arrayBufferToBase64(credential.response.userHandle) : null
+            },
+            type: credential.type
+        };
+
+        const completeResponse = await fetch('/auth/passkey-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(credentialData)
+        });
+
+        const result = await completeResponse.json();
+
+        if (result.verified) {
+            buttonText.textContent = 'Success! Redirecting...';
+            setTimeout(() => window.location.href = result.redirect || '/dashboard', 1000);
+        } else {
+            throw new Error(result.error || 'Authentication failed');
+        }
+
+    } catch (error) {
+        console.error('Passkey authentication error:', error);
+
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'mt-4 p-3 bg-red-500/20 border border-red-500 text-red-300 rounded-lg text-sm';
+        errorDiv.textContent = error.message || 'Passkey authentication failed. Please try again or use your password.';
+
+        const existingError = button.parentNode.querySelector('.passkey-error');
+        if (existingError) existingError.remove();
+
+        errorDiv.classList.add('passkey-error');
+        button.parentNode.appendChild(errorDiv);
+
+        button.disabled = false;
+        buttonText.textContent = 'Sign in with Passkey';
+        button.classList.remove('opacity-75');
+
+        setTimeout(() => errorDiv.remove(), 5000);
+    }
+});
+
+// Utility functions
+function base64ToArrayBuffer(base64) {
+    const binaryString = window.atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+    return bytes.buffer;
+}
+
+function arrayBufferToBase64(buffer) {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+    return window.btoa(binary);
+}
+</script>
 {% endblock %}
