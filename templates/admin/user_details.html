@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}User Details - Admin - SecureVault{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-4xl font-bold text-white mb-2">👤 User Details</h1>
+            <p class="text-white/70">Detailed information for {{ user.username }}</p>
+        </div>
+        <div class="flex space-x-3">
+            <a href="/admin/users" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+                ← Back to Users
+            </a>
+            <a href="/admin" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                🛡️ Admin Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- User Profile Card -->
+    <div class="glass-effect rounded-xl p-8 mb-8">
+        <div class="flex items-center space-x-6 mb-6">
+            <!-- Avatar -->
+            <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <span class="text-white font-bold text-2xl">{{ user.username[0].upper() }}</span>
+            </div>
+            
+            <!-- User Info -->
+            <div class="flex-1">
+                <h2 class="text-3xl font-bold text-white mb-2">{{ user.username }}</h2>
+                <div class="flex items-center space-x-4">
+                    {% if user.is_admin %}
+                        <span class="bg-red-500/20 text-red-300 px-3 py-1 rounded-full text-sm font-medium">
+                            🛡️ Administrator
+                        </span>
+                    {% else %}
+                        <span class="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-sm font-medium">
+                            👤 Regular User
+                        </span>
+                    {% endif %}
+                    <span class="text-white/60 text-sm">ID: {{ user.id }}</span>
+                    <span class="text-white/60 text-sm">Joined: {{ user.created_at }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Actions -->
+        {% if user.id != session.user_id %}
+            <div class="flex space-x-4 pt-6 border-t border-white/20">
+                {% if user.is_admin %}
+                    <form method="POST" action="/admin/users/{{ user.id }}/toggle_admin" class="inline">
+                        <button type="submit" onclick="return confirm('Remove admin privileges from {{ user.username }}?')"
+                                class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            </svg>
+                            Revoke Admin Access
+                        </button>
+                    </form>
+                {% else %}
+                    <form method="POST" action="/admin/users/{{ user.id }}/toggle_admin" class="inline">
+                        <button type="submit" onclick="return confirm('Grant admin privileges to {{ user.username }}?')"
+                                class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                            </svg>
+                            Grant Admin Access
+                        </button>
+                    </form>
+                {% endif %}
+                
+                <form method="POST" action="/admin/users/{{ user.id }}/delete" class="inline">
+                    <button type="submit" onclick="return confirm('⚠️ DANGER: This will permanently delete {{ user.username }} and ALL their data including:\\n\\n• All encrypted notes\\n• All uploaded files\\n• Account information\\n\\nThis action CANNOT be undone!\\n\\nType \'DELETE\' to confirm:')"
+                            class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        Delete Account
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <div class="pt-6 border-t border-white/20">
+                <div class="bg-yellow-500/20 border border-yellow-500 text-yellow-300 px-4 py-3 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <span class="font-medium">This is your own account. You cannot modify your own admin privileges or delete your account from here.</span>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+        <div class="glass-effect rounded-xl p-6 text-center">
+            <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-1">{{ user.notes|length }}</h3>
+            <p class="text-white/70">Encrypted Notes</p>
+        </div>
+
+        <div class="glass-effect rounded-xl p-6 text-center">
+            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-1">{{ user.files|length }}</h3>
+            <p class="text-white/70">Uploaded Files</p>
+        </div>
+
+        <div class="glass-effect rounded-xl p-6 text-center">
+            <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-1">
+                {% set total_size = user.files|sum(attribute=2) if user.files else 0 %}
+                {% if total_size < 1024 %}
+                    {{ total_size }} B
+                {% elif total_size < 1048576 %}
+                    {{ "%.1f"|format(total_size / 1024) }} KB
+                {% elif total_size < 1073741824 %}
+                    {{ "%.1f"|format(total_size / 1048576) }} MB
+                {% else %}
+                    {{ "%.1f"|format(total_size / 1073741824) }} GB
+                {% endif %}
+            </h3>
+            <p class="text-white/70">Storage Used</p>
+        </div>
+    </div>
+
+    <!-- User's Notes -->
+    {% if user.notes %}
+        <div class="glass-effect rounded-xl p-6 mb-8">
+            <h3 class="text-xl font-bold text-white mb-6">📝 User's Notes ({{ user.notes|length }})</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-white/20">
+                            <th class="text-left py-3 text-white font-semibold">Title</th>
+                            <th class="text-left py-3 text-white font-semibold">Created</th>
+                            <th class="text-left py-3 text-white font-semibold">Last Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for note in user.notes[:10] %}
+                            <tr class="border-b border-white/10 hover:bg-white/5 transition-colors">
+                                <td class="py-3 text-white font-medium">{{ note[1] }}</td>
+                                <td class="py-3 text-white/70">{{ note[2] }}</td>
+                                <td class="py-3 text-white/70">{{ note[3] }}</td>
+                            </tr>
+                        {% endfor %}
+                        {% if user.notes|length > 10 %}
+                            <tr>
+                                <td colspan="3" class="py-3 text-center text-white/60">
+                                    ... and {{ user.notes|length - 10 }} more notes
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- User's Files -->
+    {% if user.files %}
+        <div class="glass-effect rounded-xl p-6">
+            <h3 class="text-xl font-bold text-white mb-6">📁 User's Files ({{ user.files|length }})</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-white/20">
+                            <th class="text-left py-3 text-white font-semibold">Filename</th>
+                            <th class="text-left py-3 text-white font-semibold">Size</th>
+                            <th class="text-left py-3 text-white font-semibold">Uploaded</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for file in user.files[:10] %}
+                            <tr class="border-b border-white/10 hover:bg-white/5 transition-colors">
+                                <td class="py-3 text-white font-medium">{{ file[1] }}</td>
+                                <td class="py-3 text-white/70">
+                                    {% if file[2] < 1024 %}
+                                        {{ file[2] }} B
+                                    {% elif file[2] < 1048576 %}
+                                        {{ "%.1f"|format(file[2] / 1024) }} KB
+                                    {% elif file[2] < 1073741824 %}
+                                        {{ "%.1f"|format(file[2] / 1048576) }} MB
+                                    {% else %}
+                                        {{ "%.1f"|format(file[2] / 1073741824) }} GB
+                                    {% endif %}
+                                </td>
+                                <td class="py-3 text-white/70">{{ file[3] }}</td>
+                            </tr>
+                        {% endfor %}
+                        {% if user.files|length > 10 %}
+                            <tr>
+                                <td colspan="3" class="py-3 text-center text-white/60">
+                                    ... and {{ user.files|length - 10 }} more files
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Empty States -->
+    {% if not user.notes and not user.files %}
+        <div class="text-center py-16">
+            <div class="glass-effect rounded-xl p-8 max-w-md mx-auto">
+                <svg class="w-16 h-16 text-white/50 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <h3 class="text-xl font-semibold text-white mb-2">No Content Yet</h3>
+                <p class="text-white/70">{{ user.username }} hasn't created any notes or uploaded any files yet.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    // Enhanced delete confirmation
+    document.querySelector('button[onclick*="DELETE"]').addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const username = '{{ user.username }}';
+        const confirmation = prompt(`⚠️ DANGER: Delete user "${username}"?\n\nThis will permanently delete:\n• All encrypted notes\n• All uploaded files\n• Account information\n\nType "DELETE" to confirm:`);
+        
+        if (confirmation === 'DELETE') {
+            if (confirm(`Final confirmation: Delete user "${username}" and ALL their data?`)) {
+                this.closest('form').submit();
+            }
+        } else if (confirmation !== null) {
+            alert('Deletion cancelled. You must type "DELETE" exactly to confirm.');
+        }
+    });
+</script>
+{% endblock %}

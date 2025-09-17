@@ -29,6 +29,7 @@ def login():
         c = conn.cursor()
         c.execute('SELECT id, username, password_hash, is_admin, force_reset FROM users WHERE username = ?', (username,))
         user = c.fetchone()
+<<<<<<< HEAD
         conn.close()
 
         if user and check_password_hash(user[2], password):
@@ -43,7 +44,32 @@ def login():
 
             flash('Login successful!', 'success')
             return redirect(url_for('dashboard'))
+=======
+        
+        if user and check_password_hash(user[1], password):
+            # Check if user has 2FA enabled
+            c.execute('SELECT is_enabled FROM user_totp WHERE user_id = ? AND is_enabled = 1', (user[0],))
+            has_2fa = c.fetchone()
+            
+            # Check if user has passkeys
+            c.execute('SELECT COUNT(*) FROM user_passkeys WHERE user_id = ?', (user[0],))
+            has_passkeys = c.fetchone()[0] > 0
+            
+            conn.close()
+            
+            if has_2fa:
+                # Require 2FA verification
+                session['pending_user_id'] = user[0]
+                return redirect(url_for('security.verify_2fa'))
+            else:
+                # Complete login directly
+                session['user_id'] = user[0]
+                session['username'] = username
+                flash('Login successful!', 'success')
+                return redirect(url_for('dashboard'))
+>>>>>>> ee3fdc1 (Release v2.0.0: Admin panel v2, half created passkey and totp system, and local network actcess)
         else:
+            conn.close()
             flash('Invalid username or password', 'error')
 
     return render_template('login.html')
@@ -68,7 +94,7 @@ def register():
             c.execute('INSERT INTO users (username, password_hash, encryption_key) VALUES (?, ?, ?)',
                       (username, password_hash, encryption_key))
             conn.commit()
-            flash('Registration successful! Please log in.', 'success')
+            flash('Registration successful! Please log in and consider setting up two-factor authentication.', 'success')
             return redirect(url_for('auth.login'))
         except sqlite3.IntegrityError:
             flash('Username already exists', 'error')

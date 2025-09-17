@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - Admin - SecureVault{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-4xl font-bold text-white mb-2">👥 User Management</h1>
+            <p class="text-white/70">Manage users and their access</p>
+        </div>
+        <a href="/admin" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Search and Stats Bar -->
+    <div class="glass-effect rounded-xl p-6 mb-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+            <!-- Search -->
+            <form method="GET" class="flex-1 max-w-md">
+                <div class="relative">
+                    <input type="text" name="search" value="{{ search }}" 
+                           class="input-field w-full pl-10 pr-4 py-3 rounded-lg transition-all duration-200"
+                           placeholder="Search users...">
+                    <svg class="absolute left-3 top-3.5 w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </form>
+
+            <!-- Stats -->
+            <div class="flex items-center space-x-6 text-white/70">
+                <div class="text-center">
+                    <div class="text-xl font-bold text-white">{{ total_users }}</div>
+                    <div class="text-xs">Total Users</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xl font-bold text-blue-400">{{ page }}</div>
+                    <div class="text-xs">Page {{ page }} of {{ total_pages }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    {% if users %}
+        <div class="glass-effect rounded-xl p-6 mb-8">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-white/20">
+                            <th class="text-left py-4 text-white font-semibold">User</th>
+                            <th class="text-left py-4 text-white font-semibold">Joined</th>
+                            <th class="text-left py-4 text-white font-semibold">Role</th>
+                            <th class="text-left py-4 text-white font-semibold">Content</th>
+                            <th class="text-left py-4 text-white font-semibold">Storage</th>
+                            <th class="text-center py-4 text-white font-semibold">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr class="border-b border-white/10 hover:bg-white/5 transition-colors">
+                                <td class="py-4">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
+                                            <span class="text-white font-semibold text-sm">{{ user[1][0].upper() }}</span>
+                                        </div>
+                                        <div>
+                                            <div class="text-white font-medium">{{ user[1] }}</div>
+                                            <div class="text-white/60 text-sm">ID: {{ user[0] }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 text-white/70">
+                                    {{ user[2] }}
+                                </td>
+                                <td class="py-4">
+                                    {% if user[3] %}
+                                        <span class="bg-red-500/20 text-red-300 px-2 py-1 rounded-full text-xs font-medium">
+                                            🛡️ Admin
+                                        </span>
+                                    {% else %}
+                                        <span class="bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full text-xs font-medium">
+                                            👤 User
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-4">
+                                    <div class="text-white/70">
+                                        <div class="text-sm">📝 {{ user[4] }} notes</div>
+                                        <div class="text-sm">📁 {{ user[5] }} files</div>
+                                    </div>
+                                </td>
+                                <td class="py-4 text-white/70">
+                                    {% if user[6] %}
+                                        {% set size_mb = (user[6] / 1048576) %}
+                                        {% if size_mb < 1 %}
+                                            {{ "%.1f"|format(user[6] / 1024) }} KB
+                                        {% else %}
+                                            {{ "%.1f"|format(size_mb) }} MB
+                                        {% endif %}
+                                    {% else %}
+                                        0 B
+                                    {% endif %}
+                                </td>
+                                <td class="py-4">
+                                    <div class="flex justify-center space-x-2">
+                                        <a href="/admin/users/{{ user[0] }}" 
+                                           class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                                            👁️ View
+                                        </a>
+                                        {% if user[0] != session.user_id %}
+                                            {% if user[3] %}
+                                                <form method="POST" action="/admin/users/{{ user[0] }}/toggle_admin" class="inline">
+                                                    <button type="submit" onclick="return confirm('Remove admin privileges from {{ user[1] }}?')"
+                                                            class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                                                        ⬇️ Demote
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                <form method="POST" action="/admin/users/{{ user[0] }}/toggle_admin" class="inline">
+                                                    <button type="submit" onclick="return confirm('Grant admin privileges to {{ user[1] }}?')"
+                                                            class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                                                        ⬆️ Promote
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                            <form method="POST" action="/admin/users/{{ user[0] }}/delete" class="inline">
+                                                <button type="submit" onclick="return confirm('DELETE USER {{ user[1] }}? This will permanently delete all their data and cannot be undone!')"
+                                                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                                                    🗑️ Delete
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <span class="bg-gray-500/50 text-gray-400 px-3 py-1 rounded text-sm">
+                                                You
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        {% if total_pages > 1 %}
+            <div class="flex justify-center space-x-2">
+                {% for page_num in range(1, total_pages + 1) %}
+                    {% if page_num == page %}
+                        <span class="bg-blue-500 text-white px-4 py-2 rounded-lg font-medium">{{ page_num }}</span>
+                    {% else %}
+                        <a href="?page={{ page_num }}{% if search %}&search={{ search }}{% endif %}" 
+                           class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
+                            {{ page_num }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="text-center py-16">
+            <div class="glass-effect rounded-xl p-8 max-w-md mx-auto">
+                <svg class="w-16 h-16 text-white/50 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                </svg>
+                <h3 class="text-xl font-semibold text-white mb-2">No Users Found</h3>
+                <p class="text-white/70 mb-6">
+                    {% if search %}
+                        No users match your search criteria.
+                    {% else %}
+                        No users in the system yet.
+                    {% endif %}
+                </p>
+                {% if search %}
+                    <a href="/admin/users" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                        Clear Search
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    // Auto-submit search form on input
+    document.querySelector('input[name="search"]').addEventListener('input', function() {
+        clearTimeout(this.searchTimeout);
+        this.searchTimeout = setTimeout(() => {
+            this.form.submit();
+        }, 500);
+    });
+</script>
+{% endblock %}

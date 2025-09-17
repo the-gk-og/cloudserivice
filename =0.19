@@ -1,0 +1,10 @@
+Defaulting to user installation because normal site-packages is not writeable
+Collecting python-gettext
+  Downloading python_gettext-5.0-py3-none-any.whl.metadata (4.6 kB)
+Collecting setuptools
+  Using cached setuptools-80.9.0-py3-none-any.whl.metadata (6.6 kB)
+Requirement already satisfied: fasteners in /usr/lib/python3/dist-packages (0.18)
+Downloading python_gettext-5.0-py3-none-any.whl (13 kB)
+Using cached setuptools-80.9.0-py3-none-any.whl (1.2 MB)
+Installing collected packages: setuptools, python-gettext
+Successfully installed python-gettext-5.0 setuptools-80.9.0

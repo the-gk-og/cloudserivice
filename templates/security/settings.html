@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Security Settings - SecureVault{% endblock %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-4xl font-bold text-white mb-2">🔐 Security Settings</h1>
+            <p class="text-white/70">Manage your account security and two-factor authentication</p>
+        </div>
+        <a href="/dashboard" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Security Status Overview -->
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+        <div class="glass-effect rounded-xl p-6 text-center">
+            <div class="w-12 h-12 {% if totp_enabled %}bg-green-500{% else %}bg-yellow-500{% endif %} rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">TOTP Authentication</h3>
+            <p class="{% if totp_enabled %}text-green-400{% else %}text-yellow-400{% endif %} text-sm font-medium">
+                {% if totp_enabled %}✅ Enabled{% else %}⚠️ Disabled{% endif %}
+            </p>
+        </div>
+
+        <div class="glass-effect rounded-xl p-6 text-center">
+            <div class="w-12 h-12 {% if passkeys %}bg-green-500{% else %}bg-yellow-500{% endif %} rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 12H9v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-6.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Passkeys</h3>
+            <p class="{% if passkeys %}text-green-400{% else %}text-yellow-400{% endif %} text-sm font-medium">
+                {% if passkeys %}✅ {{ passkeys|length }} Active{% else %}⚠️ None{% endif %}
+            </p>
+        </div>
+
+        <div class="glass-effect rounded-xl p-6 text-center">
+            <div class="w-12 h-12 {% if totp_enabled or passkeys %}bg-green-500{% else %}bg-red-500{% endif %} rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white mb-2">Security Level</h3>
+            <p class="{% if totp_enabled or passkeys %}text-green-400{% else %}text-red-400{% endif %} text-sm font-medium">
+                {% if totp_enabled or passkeys %}🔒 High{% else %}⚠️ Basic{% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- TOTP Authentication Section -->
+    <div class="glass-effect rounded-xl p-6 mb-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="text-xl font-bold text-white mb-2">📱 TOTP Authentication</h3>
+                <p class="text-white/70">Use an authenticator app like Google Authenticator or Authy</p>
+            </div>
+            {% if totp_enabled %}
+                <span class="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-sm font-medium">
+                    ✅ Active
+                </span>
+            {% else %}
+                <span class="bg-red-500/20 text-red-300 px-3 py-1 rounded-full text-sm font-medium">
+                    ❌ Inactive
+                </span>
+            {% endif %}
+        </div>
+
+        {% if not totp_enabled %}
+            <div class="bg-blue-500/20 border border-blue-500 text-blue-300 px-4 py-3 rounded-lg mb-4">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="font-medium">TOTP provides an extra layer of security by requiring a time-based code from your mobile device.</span>
+                </div>
+            </div>
+            <a href="/security/setup-totp" class="inline-flex items-center px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Set Up TOTP
+            </a>
+        {% else %}
+            <div class="flex items-center space-x-4">
+                <div class="flex-1">
+                    <p class="text-green-400 font-medium mb-2">✅ TOTP is enabled and protecting your account</p>
+                    <p class="text-white/70 text-sm">Your account requires a TOTP code in addition to your password when logging in.</p>
+                </div>
+                <form method="POST" action="/security/disable-totp" class="inline">
+                    <input type="password" name="password" placeholder="Enter password" required
+                           class="input-field px-3 py-2 rounded mr-2" style="width: 150px;">
+                    <button type="submit" onclick="return confirm('Are you sure you want to disable TOTP? This will reduce your account security.')"
+                            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors">
+                        Disable TOTP
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Passkeys Section -->
+    <div class="glass-effect rounded-xl p-6 mb-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="text-xl font-bold text-white mb-2">🔑 Passkeys</h3>
+                <p class="text-white/70">Passwordless authentication using biometrics or security keys</p>
+            </div>
+            <a href="/security/setup-passkey" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Add Passkey
+            </a>
+        </div>
+
+        {% if passkeys %}
+            <div class="space-y-3">
+                {% for passkey in passkeys %}
+                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 12H9v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-6.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-medium">{{ passkey[1] }}</h4>
+                                <p class="text-white/60 text-sm">
+                                    Created: {{ passkey[2] }}
+                                    {% if passkey[3] %} • Last used: {{ passkey[3] }}{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <form method="POST" action="/security/passkey/delete/{{ passkey[0] }}" class="inline">
+                            <button type="submit" onclick="return confirm('Delete this passkey?')"
+                                    class="text-red-400 hover:text-red-300 p-2 rounded transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-8">
+                <svg class="w-16 h-16 text-white/50 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 12H9v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-6.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                </svg>
+                <h4 class="text-white font-medium mb-2">No Passkeys Configured</h4>
+                <p class="text-white/70 mb-4">Passkeys provide the most secure and convenient way to sign in.</p>
+                <a href="/security/setup-passkey" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    Set Up Your First Passkey
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Security Recommendations -->
+    <div class="glass-effect rounded-xl p-6">
+        <h3 class="text-xl font-bold text-white mb-4">💡 Security Recommendations</h3>
+        <div class="space-y-3">
+            {% if not totp_enabled and not passkeys %}
+                <div class="flex items-start space-x-3 p-3 bg-red-500/20 border border-red-500 rounded-lg">
+                    <svg class="w-5 h-5 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                    <div>
+                        <h4 class="text-red-300 font-medium">Critical: Enable Two-Factor Authentication</h4>
+                        <p class="text-red-200 text-sm">Your account is only protected by a password. Enable TOTP or add a passkey for better security.</p>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="flex items-start space-x-3 p-3 bg-blue-500/20 border border-blue-500 rounded-lg">
+                <svg class="w-5 h-5 text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <h4 class="text-blue-300 font-medium">Use Both TOTP and Passkeys</h4>
+                    <p class="text-blue-200 text-sm">For maximum security, set up both TOTP and passkeys. This provides redundancy and flexibility.</p>
+                </div>
+            </div>
+            
+            <div class="flex items-start space-x-3 p-3 bg-green-500/20 border border-green-500 rounded-lg">
+                <svg class="w-5 h-5 text-green-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <h4 class="text-green-300 font-medium">Keep Backup Codes Safe</h4>
+                    <p class="text-green-200 text-sm">Store your TOTP backup codes in a secure location. They can help you regain access if you lose your device.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

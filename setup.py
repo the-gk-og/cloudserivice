@@ -10,6 +10,7 @@ def create_directory_structure():
     """Create necessary directories"""
     directories = [
         'templates',
+        'templates/admin',
         'uploads',
         'static',
         'static/css',
@@ -70,6 +71,9 @@ def create_template_files():
                         <a href="/dashboard" class="text-white hover:text-blue-300 px-3 py-2 transition-colors">Dashboard</a>
                         <a href="/notes" class="text-white hover:text-blue-300 px-3 py-2 transition-colors">Notes</a>
                         <a href="/files" class="text-white hover:text-blue-300 px-3 py-2 transition-colors">Files</a>
+                        {% if is_admin %}
+                            <a href="/admin" class="text-yellow-300 hover:text-yellow-200 px-3 py-2 transition-colors font-medium">🛡️ Admin</a>
+                        {% endif %}
                         <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors">Logout</a>
                     {% else %}
                         <a href="/login" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors">Login</a>
@@ -374,6 +378,168 @@ def create_template_files():
                 </a>
             </div>
         </form>
+    </div>
+</div>
+{% endblock %}''',
+
+        'templates/admin/dashboard.html': '''{% extends "base.html" %}
+{% block content %}
+<div class="animate-fade-in">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-4xl font-bold text-white mb-2">🛡️ Admin Dashboard</h1>
+            <p class="text-white/70">System overview and management</p>
+        </div>
+        <div class="flex space-x-3">
+            <a href="/admin/users" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">👥 Users</a>
+            <a href="/admin/system" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors">⚙️ System</a>
+        </div>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center">
+            <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-white text-xl">👥</span>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-1">{{ stats.total_users if stats else 0 }}</h3>
+            <p class="text-white/70">Total Users</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center">
+            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-white text-xl">📝</span>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-1">{{ stats.total_notes if stats else 0 }}</h3>
+            <p class="text-white/70">Notes</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center">
+            <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-white text-xl">📁</span>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-1">{{ stats.total_files if stats else 0 }}</h3>
+            <p class="text-white/70">Files</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center">
+            <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-white text-xl">💾</span>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-1">{{ stats.total_file_size if stats else '0 B' }}</h3>
+            <p class="text-white/70">Storage</p>
+        </div>
+    </div>
+</div>
+{% endblock %}''',
+
+        'templates/admin/users.html': '''{% extends "base.html" %}
+{% block content %}
+<div class="animate-fade-in">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold text-white">👥 User Management</h1>
+        <a href="/admin" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">← Back</a>
+    </div>
+    
+    {% if users %}
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-6">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-white/20">
+                            <th class="text-left py-4 text-white">User</th>
+                            <th class="text-left py-4 text-white">Role</th>
+                            <th class="text-left py-4 text-white">Content</th>
+                            <th class="text-center py-4 text-white">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr class="border-b border-white/10">
+                                <td class="py-4 text-white">{{ user[1] }}</td>
+                                <td class="py-4">
+                                    {% if user[3] %}
+                                        <span class="bg-red-500/20 text-red-300 px-2 py-1 rounded text-xs">🛡️ Admin</span>
+                                    {% else %}
+                                        <span class="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs">👤 User</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-4 text-white/70">{{ user[4] }} notes, {{ user[5] }} files</td>
+                                <td class="py-4 text-center">
+                                    <a href="/admin/users/{{ user[0] }}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm mr-2">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-12">
+            <p class="text-white/70">No users found</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}''',
+
+        'templates/admin/user_details.html': '''{% extends "base.html" %}
+{% block content %}
+<div class="animate-fade-in">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-4xl font-bold text-white mb-2">👤 User Details</h1>
+            <p class="text-white/70">Information for {{ user.username }}</p>
+        </div>
+        <a href="/admin/users" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">← Back</a>
+    </div>
+
+    <!-- User Profile -->
+    <div class="bg-white/10 backdrop-blur-md rounded-xl p-8 mb-8">
+        <div class="flex items-center space-x-6 mb-6">
+            <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <span class="text-white font-bold text-2xl">{{ user.username[0].upper() }}</span>
+            </div>
+            <div>
+                <h2 class="text-3xl font-bold text-white mb-2">{{ user.username }}</h2>
+                <div class="flex items-center space-x-4">
+                    {% if user.is_admin %}
+                        <span class="bg-red-500/20 text-red-300 px-3 py-1 rounded-full text-sm">🛡️ Admin</span>
+                    {% else %}
+                        <span class="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-sm">👤 User</span>
+                    {% endif %}
+                    <span class="text-white/60 text-sm">Joined: {{ user.created_at }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        {% if user.id != session.user_id %}
+            <div class="flex space-x-4 pt-6 border-t border-white/20">
+                <form method="POST" action="/admin/users/{{ user.id }}/toggle_admin" class="inline">
+                    <button type="submit" onclick="return confirm('Toggle admin status for {{ user.username }}?')"
+                            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded transition-colors">
+                        {% if user.is_admin %}Revoke Admin{% else %}Make Admin{% endif %}
+                    </button>
+                </form>
+                <form method="POST" action="/admin/users/{{ user.id }}/delete" class="inline">
+                    <button type="submit" onclick="return confirm('Delete {{ user.username }} and all their data?')"
+                            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors">
+                        Delete User
+                    </button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Stats -->
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center">
+            <h3 class="text-2xl font-bold text-white mb-1">{{ user.notes|length }}</h3>
+            <p class="text-white/70">Notes</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center">
+            <h3 class="text-2xl font-bold text-white mb-1">{{ user.files|length }}</h3>
+            <p class="text-white/70">Files</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center">
+            <h3 class="text-2xl font-bold text-white mb-1">Active</h3>
+            <p class="text-white/70">Status</p>
+        </div>
     </div>
 </div>
 {% endblock %}'''

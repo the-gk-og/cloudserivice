@@ -2,11 +2,11 @@ from flask import Flask, render_template, session
 from auth import auth_bp, login_required
 from notes import notes_bp
 from files import files_bp
-from admin import admin_bp  # ← Make sure this is imported
+from admin import admin_bp
+from security import security_bp, init_security_db
 from database import init_db
 import secrets
 import os
-import sqlite3 
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
@@ -21,11 +21,27 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 # Ensure upload directory exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Register blueprints AFTER app is defined
+# Register blueprints
 app.register_blueprint(auth_bp)
 app.register_blueprint(notes_bp)
 app.register_blueprint(files_bp)
-app.register_blueprint(admin_bp)  # ← This line was too early before
+app.register_blueprint(admin_bp)
+app.register_blueprint(security_bp)
+
+# Template context processor for admin check
+@app.context_processor
+def inject_admin_status():
+    is_admin = False
+    if 'user_id' in session:
+        import sqlite3
+        conn = sqlite3.connect('secure_app.db')
+        c = conn.cursor()
+        c.execute('SELECT is_admin FROM users WHERE id = ?', (session['user_id'],))
+        user = c.fetchone()
+        conn.close()
+        is_admin = user[0] if user else False
+    
+    return dict(is_admin=is_admin)
 
 # Routes
 @app.route('/')
@@ -37,16 +53,22 @@ def home():
 def dashboard():
     return render_template('dashboard.html', username=session['username'])
 
-@app.context_processor
-def inject_admin_status():
-    if 'user_id' in session:
-        conn = sqlite3.connect('secure_app.db')
-        c = conn.cursor()
-        c.execute('SELECT is_admin FROM users WHERE id = ?', (session['user_id'],))
-        result = c.fetchone()
-        conn.close()
-        return {'is_admin': result[0] if result else 0}
-    return {'is_admin': 0}
+if __name__ == '__main__':
+    init_db()
+    init_security_db()
+    #app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
+def dashboard():
+    return render_template('dashboard.html', username=session['username'])
+
+if __name__ == '__main__':
+    init_db()
+    init_security_db()
+    #app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
+def dashboard():
+    return render_template('dashboard.html', username=session['username'])
+
 if __name__ == '__main__':
     init_db()
     #app.run(debug=True)
