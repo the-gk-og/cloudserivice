@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}User Profile{% endblock %}
+{% block content %}
+<h2 class="text-2xl font-bold text-white mb-4">User Profile</h2>
+<div class="bg-white/10 border border-white/20 p-6 rounded-lg text-white">
+    <p><strong>Username:</strong> {{ user[0] }}</p>
+    <p><strong>Created At:</strong> {{ user[1] }}</p>
+    <p><strong>Admin:</strong> {{ 'Yes' if user[2] == 1 else 'No' }}</p>
+    <p><strong>Total Notes:</strong> {{ note_count }}</p>
+    <p><strong>Total Files:</strong> {{ file_count }}</p>
+</div>
+<a href="{{ url_for('admin.admin_dashboard') }}" class="mt-6 inline-block text-blue-300 hover:text-blue-400">← Back to Dashboard</a>
+{% endblock %}

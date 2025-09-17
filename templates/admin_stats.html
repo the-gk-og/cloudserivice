@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>System Stats</h2>
+<ul>
+    <li><strong>Total Users:</strong> {{ users }}</li>
+    <li><strong>Total Notes:</strong> {{ notes }}</li>
+    <li><strong>Total Files:</strong> {{ files }}</li>
+    <li><strong>Total Storage Used:</strong> {{ (storage / 1024 / 1024) | round(2) }} MB</li>
+</ul>
+<a href="{{ url_for('admin.admin_dashboard') }}">← Back to Dashboard</a>
+{% endblock %}

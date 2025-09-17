@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold text-white mb-8">Edit Note</h1>
+    <div class="bg-white/10 backdrop-blur-md rounded-xl p-8">
+        <form method="POST" class="space-y-6">
+            <div>
+                <label for="title" class="block text-white mb-2 font-medium">Note Title</label>
+                <input type="text" id="title" name="title" value="{{ title }}" required 
+                       class="input-field w-full px-4 py-3 rounded-lg transition-all duration-200">
+            </div>
+            <div>
+                <label for="content" class="block text-white mb-2 font-medium">Note Content</label>
+                <textarea id="content" name="content" required rows="10" 
+                          class="input-field w-full px-4 py-3 rounded-lg resize-vertical transition-all duration-200">{{ content }}</textarea>
+            </div>
+            <div class="flex space-x-4 pt-4">
+                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    ✅ Save Changes
+                </button>
+                <a href="/notes" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

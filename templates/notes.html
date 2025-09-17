@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-white">My Notes</h1>
+    <a href="/add_note" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">New Note</a>
+</div>
+{% if notes %}
+    <div class="grid gap-4">
+        {% for note in notes %}
+        <div class="bg-white/10 backdrop-blur-md rounded-xl p-4">
+            <h3 class="text-white font-bold mb-2">{{ note[1] }}</h3>
+            <p class="text-white/60 text-sm mb-2">{{ note[2] }}</p>
+            <div class="flex space-x-2">
+                <a href="/view_note/{{ note[0] }}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">View</a>
+                <a href="/edit_note/{{ note[0] }}" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">Edit</a>
+                <a href="/delete_note/{{ note[0] }}" onclick="return confirm('Delete this note?')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-12">
+        <p class="text-white/70 mb-4">No notes yet</p>
+        <a href="/add_note" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded">Create Your First Note</a>
+    </div>
+{% endif %}
+{% endblock %}

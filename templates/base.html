@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SecureVault{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .input-field {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            color: white !important;
+        }
+
+        .input-field:focus {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            border-color: rgb(59, 130, 246) !important;
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5) !important;
+        }
+
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+
+        input[type="text"], input[type="password"], textarea {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900">
+    <nav class="bg-black/20 backdrop-blur-md border-b border-white/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/" class="text-white text-xl font-bold hover:text-blue-300 transition-colors">🔒 SecureVault</a>
+                <div class="flex space-x-4">
+                    {% if session.user_id %}
+                        <span class="text-white/70">Welcome, {{ session.username }}!</span>
+                        <a href="/dashboard" class="text-white hover:text-blue-300 px-3 py-2 transition-colors">Dashboard</a>
+                        <a href="/notes" class="text-white hover:text-blue-300 px-3 py-2 transition-colors">Notes</a>
+                        <a href="/files" class="text-white hover:text-blue-300 px-3 py-2 transition-colors">Files</a>
+
+                        {% if is_admin == 1 %}
+                            <a href="/admin" class="text-yellow-300 hover:text-yellow-400 px-3 py-2 transition-colors">Admin Panel</a>
+                            <a href="/admin/stats" class="text-yellow-300 hover:text-yellow-400 px-3 py-2 transition-colors">System Stats</a>
+                        {% endif %}
+
+                        <a href="/logout" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition-colors">Logout</a>
+                    {% else %}
+                        <a href="/login" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors">Login</a>
+                        <a href="/register" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors">Sign Up</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 p-4 rounded-lg animate-pulse {% if category == 'error' %}bg-red-500/80 border border-red-400 text-white{% elif category == 'success' %}bg-green-500/80 border border-green-400 text-white{% else %}bg-blue-500/80 border border-blue-400 text-white{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold text-white mb-8">Upload File</h1>
+    <div class="bg-white/10 backdrop-blur-md rounded-xl p-8">
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            <div>
+                <label for="file" class="block text-white mb-2 font-medium">Select File</label>
+                <input type="file" id="file" name="file" required 
+                       class="input-field w-full px-4 py-3 rounded-lg transition-all duration-200 
+                              file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 
+                              file:text-sm file:font-medium file:bg-blue-500 file:text-white 
+                              hover:file:bg-blue-600 file:transition-colors">
+                <p class="text-white/60 text-sm mt-2">
+                    📁 Max size: 16MB<br>
+                    📄 Supported: TXT, PDF, PNG, JPG, JPEG, GIF, DOC, DOCX, ZIP, RAR
+                </p>
+            </div>
+            <div class="flex space-x-4 pt-4">
+                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    📤 Upload File
+                </button>
+                <a href="/files" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-white">{{ title }}</h1>
+        <div class="space-x-2">
+            <a href="/edit_note/{{ request.view_args.note_id }}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Edit</a>
+            <a href="/notes" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Back</a>
+        </div>
+    </div>
+    <div class="bg-white/10 backdrop-blur-md rounded-xl p-8">
+        <div class="text-white whitespace-pre-wrap">{{ content }}</div>
+        <div class="mt-4 pt-4 border-t border-white/20 text-white/60 text-sm">
+            <p>Created: {{ created_at }}</p>
+            {% if updated_at != created_at %}
+            <p>Updated: {{ updated_at }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

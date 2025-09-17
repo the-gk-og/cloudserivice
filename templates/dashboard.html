@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="text-center mb-8">
+    <h1 class="text-4xl font-bold text-white mb-4">Welcome, {{ username }}!</h1>
+    <p class="text-white/70">Your secure vault is ready</p>
+</div>
+<div class="grid md:grid-cols-2 gap-8">
+    <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center">
+        <h3 class="text-xl font-bold text-white mb-4">Encrypted Notes</h3>
+        <p class="text-white/70 mb-4">Create and manage secure notes</p>
+        <a href="/notes" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Manage Notes</a>
+    </div>
+    <div class="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center">
+        <h3 class="text-xl font-bold text-white mb-4">Secure Files</h3>
+        <p class="text-white/70 mb-4">Upload and store files securely</p>
+        <a href="/files" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Manage Files</a>
+    </div>
+</div>
+{% endblock %}
